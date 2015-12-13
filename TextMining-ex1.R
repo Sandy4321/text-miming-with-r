@@ -1,4 +1,3 @@
-## ----load_packages, message=FALSE----------------------------------------
 library(tm)              # Framework for text mining.
 library(SnowballC)       # Provides wordStem() for stsis of transcripts.
 library(qdapDictionaries)
@@ -13,7 +12,6 @@ library(Rgraphviz)       # Correlation plots.
 # biocLite('Rgraphviz')
 
 
-## ----additional_dependent_pacakges, echo=FALSE, message=FALSE------------
 # These are dependencies that would otherwise be loaded as required.
 
 library(magrittr)         #
@@ -23,10 +21,10 @@ library(stringr)
 ## library(help=rattle)
 
 
+## convert pdf to txt
 ## system("for f in *.pdf; do pdftotext -enc ASCII7 -nopgbrk $f; done")
 
-
-## ----cli_convert_doc, eval=FALSE-----------------------------------------
+## convert doc fo txt
 ## system("for f in *.doc; do antiword $f; done")
 
 
@@ -70,7 +68,6 @@ summary(docs)
 ## docs <- Corpus(DirSource(cname), readerControl=list(reader=readDOC("-r -s")))
 
 
-## ----out.lines=26--------------------------------------------------------
 inspect(docs[16])
 writeLines(as.character(docs[[16]]))
 
@@ -85,83 +82,64 @@ docs <- tm_map(docs, toSpace, "/")
 docs <- tm_map(docs, toSpace, "@")
 docs <- tm_map(docs, toSpace, "\\|")
 
-
-## ----eval=FALSE----------------------------------------------------------
-## docs <- tm_map(docs, toSpace, "/|@|\\|")
-## 
-
-
-## ----out.lines=26--------------------------------------------------------
 inspect(docs[16])
 writeLines(as.character(docs[[16]]))
 
-## ------------------------------------------------------------------------
+## do the same in a single line
+## docs <- tm_map(docs, toSpace, "/|@|\\|")
+
+
+## to lowercase
 docs <- tm_map(docs, content_transformer(tolower))
 
-
-## ----out.lines=26--------------------------------------------------------
 inspect(docs[16])
 writeLines(as.character(docs[[16]]))
 
 
-## ------------------------------------------------------------------------
+## remove numbers
 docs <- tm_map(docs, removeNumbers)
 
-
-## ----out.lines=26--------------------------------------------------------
 inspect(docs[16])
 writeLines(as.character(docs[[16]]))
 
 
-## ------------------------------------------------------------------------
+## remove punctuation
 docs <- tm_map(docs, removePunctuation)
 
-
-## ----out.lines=26--------------------------------------------------------
 inspect(docs[16])
 writeLines(as.character(docs[[16]]))
 
 
-## ------------------------------------------------------------------------
+## remove stop words
 docs <- tm_map(docs, removeWords, stopwords("english"))
 
-
-## ----out.lines=26--------------------------------------------------------
 inspect(docs[16])
 writeLines(as.character(docs[[16]]))
 
-
-## ----list_stopwords------------------------------------------------------
 length(stopwords("english"))
 stopwords("english")
 
 
-## ----remove_own_stopwords------------------------------------------------
+## remove own stopwords
 docs <- tm_map(docs, removeWords, c("department", "email", "lewis"))
 
-
-## ----out.lines=26--------------------------------------------------------
 inspect(docs[16])
 writeLines(as.character(docs[[16]]))
 
 
-## ------------------------------------------------------------------------
+## strip whitespaces
 docs <- tm_map(docs, stripWhitespace)
 
-
-## ----out.lines=26--------------------------------------------------------
 inspect(docs[16])
 writeLines(as.character(docs[[16]]))
 
 
-## ----specific_transforms-------------------------------------------------
+## specific transforms
 toString <- content_transformer(function(x, from, to) gsub(from, to, x))
 docs <- tm_map(docs, toString, "harbin institute technology", "HIT")
 docs <- tm_map(docs, toString, "shenzhen institutes advanced technology", "SIAT")
 docs <- tm_map(docs, toString, "chinese academy sciences", "CAS")
 
-
-## ----out.lines=26--------------------------------------------------------
 inspect(docs[16])
 writeLines(as.character(docs[[16]]))
 
@@ -170,27 +148,20 @@ writeLines(as.character(docs[[16]]))
 library(SnowballC)
 docs <- tm_map(docs, stemDocument)
 
-
-## ----out.lines=26--------------------------------------------------------
 inspect(docs[16])
 writeLines(as.character(docs[[16]]))
 
 
-## ----create_document_term_matrix, out.lines=20---------------------------
+## create document term matrix
 dtm <- DocumentTermMatrix(docs)
 dtm
 
-
-## ----inspect_dtm---------------------------------------------------------
 inspect(dtm[1:5, 1000:1005])
-
-
-## ----dtm_matrix----------------------------------------------------------
 class(dtm)
 dim(dtm)
 
 
-## ----create_term_document_matrix, out.lines=20---------------------------
+## create term document matrix
 tdm <- TermDocumentMatrix(docs)
 tdm
 class(tdm)
