@@ -6,6 +6,7 @@ library(RColorBrewer)    # Generate palette of colours for plots.
 library(ggplot2)         # Plot word frequencies.
 library(scales)          # Include commas in numbers.
 library(Rgraphviz)       # Correlation plots.
+library(wordcloud)
 
 # install from bioconductor
 # source('http://bioconductor.org/biocLite.R')
@@ -47,7 +48,6 @@ dir(cname)
 
 
 ## load corpus
-library(tm)
 docs <- Corpus(DirSource(cname))
 docs
 class(docs)
@@ -57,16 +57,16 @@ summary(docs)
 inspect(docs[16])
 writeLines(as.character(docs[[16]]))
 
-## ----read_pdf, eval=FALSE------------------------------------------------
+## read PDF instead od txt
 ## cname2 <- file.path(".", "corpus", "pdf")
 ## docs2 <- Corpus(DirSource(cname2), readerControl=list(reader=readPDF))
 
 
-## ----read_doc, eval=FALSE------------------------------------------------
+## read DOC instead od txt
 ## docs <- Corpus(DirSource(cname), readerControl=list(reader=readDOC))
 
 
-## ----read_doc_options, eval=FALSE----------------------------------------
+## read DOC with options instead od txt
 ## docs <- Corpus(DirSource(cname), readerControl=list(reader=readDOC("-r -s")))
 
 
@@ -143,7 +143,6 @@ writeLines(as.character(docs[[16]]))
 
 
 ## ------------------------------------------------------------------------
-library(SnowballC)
 docs <- tm_map(docs, stemDocument)
 
 inspect(docs[16])
@@ -178,7 +177,6 @@ ord <- order(freq)
 # Least frequent terms
 freq[head(ord)]
 
-
 # Most frequent terms
 freq[tail(ord)]
 
@@ -186,14 +184,13 @@ freq[tail(ord)]
 head(table(freq), 15)
 tail(table(freq), 15)
 
-
 ## dtm -> matrix
 m <- as.matrix(dtm)
 dim(m)
 
 
 ## save DTM to csv file
-## write.csv(m, file="dtm.csv")
+write.csv(m, file="dtm.csv")
 
 
 ## remove sparse terms
@@ -215,10 +212,8 @@ table(freq)
 ## freq terms 1000
 findFreqTerms(dtm, lowfreq=1000)
 
-
 ## freq terms 100
 findFreqTerms(dtm, lowfreq=100)
-
 
 ## assoc rules
 findAssocs(dtm, "data", corlimit=0.5)
@@ -245,7 +240,6 @@ head(wf)
 
 
 ## plot freq
-library(ggplot2)
 subset(wf, freq>500)                                                  %>%
   ggplot(aes(word, freq))                                              +
   geom_bar(stat="identity")                                            +
@@ -253,7 +247,6 @@ subset(wf, freq>500)                                                  %>%
 
 
 ## wordcloud
-library(wordcloud)
 set.seed(123)
 wordcloud(names(freq), freq, min.freq=40)
 
@@ -284,9 +277,6 @@ dark2 <- brewer.pal(6, "Dark2")
 wordcloud(names(freq), freq, min.freq=100, rot.per=0.2, colors=dark2)
 
 
-## library qdap
-library(qdap)
-
 ## qdap create word list
 words <- dtm                                                          %>%
   as.matrix                                                           %>%
@@ -312,9 +302,6 @@ data.frame(nletters=nchar(words))                                     %>%
 
 
 ## qdap letter freq plot
-library(dplyr)
-library(stringr)
-
 words                                                        %>%
   str_split("")                                                       %>%
   sapply(function(x) x[-1])                                           %>%
