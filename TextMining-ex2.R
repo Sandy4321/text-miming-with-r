@@ -5,6 +5,7 @@
 require(quanteda)
 
 
+# 2 First Foray
 # 2.1 Loading the first text file
 
 # read the text as a single file
@@ -87,5 +88,112 @@ topfeatures(mobyDfm)
 
 plot(topfeatures(mobyDfm, 100), log = "y", cex = .6, ylab = "Term frequency")
 
+
+# 3 Accessing and Comparing Word Frequency Data
+# 3.1 Accessing Word Data
+
+# frequencies of 'he' and 'she' - these are matrixes, not numerics
+mobyDfm[, c("he", "she", "him", "her")]
+
+mobyDfm[, "her"]
+
+mobyDfm[, "him"]/mobyDfm[, "her"]
+
+mobyDfm[, "he"]/mobyDfm[, "she"]
+
+
+# 3.2 Recycling
+mobyDfmPct <- weight(mobyDfm, "relFreq") * 100
+mobyDfmPct[, "the"]
+
+
+plot(topfeatures(mobyDfmPct), type="b",
+     xlab="Top Ten Words", ylab="Percentage of Full Text", xaxt ="n")
+axis(1, 1:10, labels = names(topfeatures(mobyDfmPct)))
+
+# 4 Token Distribution Analysis
+# 4.1 Dispersion plots
+
+# using words from tokenized corpus for dispersion
+plot(kwic(novel.v, "whale"))
+
+plot(kwic(novel.v, "Ahab"))
+
+# 4.2 Searching with grep
+
+# identify the chapter break locations
+(chap.positions.v <- kwic(novel.v, "CHAPTER \\d", valuetype = "regex")$position)
+
+head(kwic(novel.v, 'chapter'))
+
+
+chaptersVec <-unlist(segment(novel.v, what='other', delimiter="CHAPTER\\s\\d", perl=TRUE))
+chaptersLowerVec <- toLower(chaptersVec)
+chaptersCorp <- corpus(chaptersVec)
+
+# Fig 4.4 barplots of whale and ahab
+
+chapDfm <- dfm(chaptersCorp)
+
+
+# 'whale'
+barplot(as.numeric(chapDfm[, 'whale']))
+
+# 'ahab'
+barplot(as.numeric(chapDfm[, 'ahab']))
+
+# Relative frequency barplots of whale and ahab
+
+relDfm <- weight(chapDfm, type='relFreq') * 100
+head(relDfm)
+
+# 'whale'
+barplot(as.numeric(relDfm[, 'whale']))
+
+# 'ahab'
+barplot(as.numeric(relDfm[, 'ahab']))
+
+# 5 Correlation
+# 5.2 Correlation Analysis
+
+wf <- as.numeric(relDfm[,'whale'])
+af <- as.numeric(relDfm[,'ahab'])
+cor(wf, af)
+
+waDfm <- cbind(relDfm[,'whale'], relDfm[,'ahab'])
+cor(as.matrix(waDfm))
+
+
+# 5.4 Random Sampling
+
+samples <- replicate(1000, cor(sample(af), sample(wf)))
+
+h <- hist(samples, breaks=100, col="grey",
+          xlab="Correlation Coefficient",
+          main="Histogram of Random Correlation Coefficients\n
+with Normal Curve",
+          plot=T)
+xfit <- seq(min(samples),max(samples),length=1000)
+yfit <- dnorm(xfit,mean=mean(samples),sd=sd(samples))
+yfit <- yfit*diff(h$mids[1:2])*length(samples)
+lines(xfit, yfit, col="black", lwd=2)
+
+
+cor.test(wf, af)
+
+
+# 6 Measures of Lexical Variety
+# 6.2 Mean word frequency
+
+firstChap <- as.matrix(chapDfm[1,])
+numWords <- length(firstChap[firstChap > 0])
+sum(chapDfm[1,])/numWords
+
+
+sum(chapDfm[1,])/ntype(chaptersCorp[1], removePunct=TRUE)
+
+# 6.3 Extracting Word Usage Means
+chapMeans <- Matrix::rowMeans(chapDfm)
+plot(chapMeans, type="h")
 
 
