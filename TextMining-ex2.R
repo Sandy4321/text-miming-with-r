@@ -2,7 +2,7 @@
 # In this vignette we show how the quanteda package can be used to replicate the analysis from Matthew Jockers' book Text Analysis with R for Students of Literature (London: Springer, 2014)
 
 #install.packages("quanteda", dependencies = TRUE)
-require(quanteda)
+library(quanteda)
 
 
 # 2 First Foray
